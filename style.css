@@ -2,9 +2,19 @@
     width: 200px;
     height: 200px;
     /* perspective: 500px; */
-    margin: 100px;
+    margin: auto;
     transform-style: preserve-3d;
     transform: rotate3d(1,0,0,-45deg);
+    scale: 0.5;
+  }
+
+  .model {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    transform-style: preserve-3d;
+    animation: turn 5s linear infinite;
+    /* transform: rotate3d(1, 1, 0, 45deg); */
   }
   
   .cube {
@@ -20,11 +30,11 @@
   .face {
     width: 200px;
     height: 200px;
-    background: skyblue;
+    background: transparent;
     /* border: 2px solid black; */
     position: absolute;
-    /* opacity: 0.5; */
-    display: flex;
+    opacity: 1;
+    /* display: flex; */
     align-items: center;
     justify-content: center;
     font-family: Arial, sans-serif;
