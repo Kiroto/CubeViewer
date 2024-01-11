@@ -24,20 +24,21 @@ let blockModelsDidLoad = false;
 const modelSelector = document.getElementById("modelSelection")
 const showcasePlace = document.getElementById("showcase");
 
+let rotation = 30
 
 const refreshModelView = () => {
     if (!defaultTexturesDidLoad) return;
     const selectedModel = modelSelector.value
     fetch(`${defaultBlockModelsPath}/${selectedModel}`)
-    .then(response => response.json())
-    .then(modelJson => {
-      const modelElement = createModelRender(modelJson, "./src/res/defaultSprite.png")
-      showcasePlace.innerHTML = ""
-      showcasePlace.appendChild(modelElement)
-    })
-    .catch(error => {
-      console.error("Error rendering model:", error);
-    });
+        .then(response => response.json())
+        .then(modelJson => {
+            const modelElement = createModelRender(modelJson, "./src/res/defaultSprite.png")
+            showcasePlace.innerHTML = ""
+            showcasePlace.appendChild(modelElement)
+        })
+        .catch(error => {
+            console.error("Error rendering model:", error);
+        });
 }
 
 modelSelector.addEventListener("change", refreshModelView)
@@ -60,26 +61,26 @@ const refreshOptions = () => {
 
 const loadDefaultBlockTextures = () => {
     fetch(blockTexturesListPath)
-    .then(response => response.json())
-    .then(blockList => {
-      blockTextureNames.push(...blockList)
-      OnBlockTexturesLoaded.fire()
-    })
-    .catch(error => {
-      console.error("Error loading blockList:", error);
-    });
+        .then(response => response.json())
+        .then(blockList => {
+            blockTextureNames.push(...blockList)
+            OnBlockTexturesLoaded.fire()
+        })
+        .catch(error => {
+            console.error("Error loading blockList:", error);
+        });
 }
 
 const loadDefaultBlockModels = () => {
     fetch(blockModelsListPath)
-    .then(response => response.json())
-    .then(blockList => {
-      blockModelNames.push(...blockList)
-      OnBlockModelsLoaded.fire()
-    })
-    .catch(error => {
-      console.error("Error loading blockList:", error);
-    });
+        .then(response => response.json())
+        .then(blockList => {
+            blockModelNames.push(...blockList)
+            OnBlockModelsLoaded.fire()
+        })
+        .catch(error => {
+            console.error("Error loading blockList:", error);
+        });
 }
 
 OnBlockTexturesLoaded.register(() => {
@@ -92,7 +93,7 @@ OnBlockModelsLoaded.register(() => {
     refreshOptions()
 })
 
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     loadDefaultBlockTextures()
     loadDefaultBlockModels()
-  });
+});

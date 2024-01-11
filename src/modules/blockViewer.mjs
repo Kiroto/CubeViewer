@@ -12,46 +12,40 @@ export const createModelRender = (modelJson, textureURL) => {
     modelElement.classList.add("model")
 
     modelJson.elements.forEach(element => {
-        const xSize = (element.to[0] - element.from[0])// * pixelToBlockRatio
-        const ySize = (element.to[1] - element.from[1])// * pixelToBlockRatio
-        const zSize = (element.to[2] - element.from[2])// * pixelToBlockRatio
+        const xSize = (element.to[0] - element.from[0])
+        const ySize = (element.to[1] - element.from[1])
+        const zSize = (element.to[2] - element.from[2])
 
         const xFacePosition = xSize / 2
         const yFacePosition = ySize / 2
         const zFacePosition = zSize / 2
 
-        const ySeparator = yFacePosition * pixelToBlockRatio
-        console.log(ySeparator)
+        const generateFace = (width, height, xRot, yRot, xPos, yPos, zPos, texture, tag = "TEXT") => {
+            const face = document.createElement("div")
+            face.innerText = tag
+            face.classList.add("face")
+            face.style.width = `${width * pixelToBlockRatio}px`
+            face.style.height = `${height * pixelToBlockRatio}px`
+            const transforms = []
+            transforms.push(`rotateY(${yRot}deg)`)
+            transforms.push(`rotateX(${xRot}deg)`)
+            transforms.push(`translateZ(${(zPos) * pixelToBlockRatio}px)`)
+            transforms.push(`translateX(${(xPos) * pixelToBlockRatio}px)`)
+            transforms.push(`translateY(${(yPos) * pixelToBlockRatio}px)`)
+            face.style.transform = transforms.join(" ")
+            face.style.backgroundImage = `url(${texture})`
+            return face
+        }
 
-        const frontFace = document.createElement("div")
-        frontFace.classList.add("face")
-        frontFace.style.transform = `translateZ(${zFacePosition * pixelToBlockRatio}px)`
-        frontFace.style.backgroundImage = `url(${textureURL})`
+        const backFace = generateFace(xSize, ySize, 0, 180, -element.from[0], -element.from[1], zSize-8, textureURL, "Back")
+        const frontFace = generateFace(xSize, ySize, 0, 0, element.from[0], -element.from[1], element.to[2]-8, textureURL, "Front")
 
-        const backFace = document.createElement("div")
-        backFace.classList.add("face")
-        backFace.style.transform = `translateZ(-${zFacePosition * pixelToBlockRatio}px) rotateY(180deg)`
-        backFace.style.backgroundImage = `url(${textureURL})`
+        const leftFace = generateFace(zSize, ySize, 0, -90, element.from[2], -element.from[1], xSize-8, textureURL, "Left")
+        const rightFace = generateFace(zSize, ySize, 0, 90, element.from[2], -element.from[1], element.to[0]-8, textureURL, "Right")
 
-        const leftFace = document.createElement("div")
-        leftFace.classList.add("face")
-        leftFace.style.transform = `translateX(-${xFacePosition * pixelToBlockRatio}px) rotateY(-90deg)`
-        leftFace.style.backgroundImage = `url(${textureURL})`
+        const topFace = generateFace(xSize, zSize, 90, 0, element.from[0], element.from[2], element.from[1]+ySize-8, textureURL, "Top")
+        const bottomFace = generateFace(xSize, zSize, -90, 0, element.from[0], element.from[2], element.to[1]-8, textureURL, "Bottom A")
 
-        const rightFace = document.createElement("div")
-        rightFace.classList.add("face")
-        rightFace.style.transform = `translateX(${xFacePosition * pixelToBlockRatio}px) rotateY(90deg)`
-        rightFace.style.backgroundImage = `url(${textureURL})`
-
-        const topFace = document.createElement("div")
-        topFace.classList.add("face")
-        topFace.style.transform = `translateY(-${ySeparator}px) rotateX(90deg)`
-        topFace.style.backgroundImage = `url(${textureURL})`
-
-        const bottomFace = document.createElement("div")
-        bottomFace.classList.add("face")
-        bottomFace.style.transform = `translateY(${ySeparator}px) rotateX(-90deg)`
-        bottomFace.style.backgroundImage = `url(${textureURL})`
 
         modelElement.appendChild(frontFace)
         modelElement.appendChild(backFace)
