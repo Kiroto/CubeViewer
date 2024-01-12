@@ -4,12 +4,40 @@ const pixelsInBlock = 200
 const blockSize = 16
 const pixelToBlockRatio = pixelsInBlock / blockSize
 
+
+const generateFace = (width, height, xRot, yRot, xPos, yPos, zPos, texture, tag = "", isHelper = false) => {
+    const face = document.createElement("div")
+    face.innerText = tag
+    face.classList.add("face")
+    if (isHelper)
+        face.classList.add("helper")
+
+    face.style.width = `${width * pixelToBlockRatio}px`
+    face.style.height = `${height * pixelToBlockRatio}px`
+
+    const transforms = []
+    transforms.push(`translateZ(${(zPos) * pixelToBlockRatio}px)`)
+    transforms.push(`translateX(${(xPos - width/2) * pixelToBlockRatio}px)`)
+    transforms.push(`translateY(${(yPos - height/2) * pixelToBlockRatio}px)`)
+    transforms.push(`rotateY(${yRot}deg)`)
+    transforms.push(`rotateX(${xRot}deg)`)
+    face.style.transform = transforms.join(" ")
+    face.style.backgroundImage = `url(${texture})`
+    return face
+}
+
+
+
 export const createModelRender = (modelJson, textureURL) => {
     const containerElement = document.createElement("div")
     containerElement.classList.add("container")
 
     const modelElement = document.createElement("div")
     modelElement.classList.add("model")
+
+    const addFace = (...args) => {
+        modelElement.appendChild(generateFace.apply(null, args))
+    }
 
     modelJson.elements.forEach((element, idx) => {
         // if (idx != 1) return;
@@ -31,44 +59,21 @@ export const createModelRender = (modelJson, textureURL) => {
         const yFacePosition = ySize / 2
         const zFacePosition = zSize / 2
 
-        const xCenter = ((element.to[0] + element.from[0]) / 2) - 8
-        const yCenter = ((element.to[1] + element.from[1]) / 2) - 8
+        const xCenter = ((element.to[0] + element.from[0]) / 2)
+        const yCenter = ((element.to[1] + element.from[1]) / 2)
         const zCenter = ((element.to[2] + element.from[2]) / 2) - 8
 
+        addFace(xSize, ySize, 0, 180, xCenter, yCenter, zCenter - zFacePosition, textureURL)
+        addFace(xSize, ySize, 0, 0, xCenter, yCenter, zCenter + zFacePosition, textureURL )
 
-        const generateFace = (width, height, xRot, yRot, xPos, yPos, zPos, texture, tag = "TEXT") => {
-            const face = document.createElement("div")
-            face.innerText = tag
-            face.classList.add("face")
-            face.style.width = `${width * pixelToBlockRatio}px`
-            face.style.height = `${height * pixelToBlockRatio}px`
-            const transforms = []
-            transforms.push(`translateZ(${(zPos) * pixelToBlockRatio}px)`)
-            transforms.push(`translateX(${(xPos) * pixelToBlockRatio}px)`)
-            transforms.push(`translateY(${(yPos) * pixelToBlockRatio}px)`)
-            transforms.push(`rotateY(${yRot}deg)`)
-            transforms.push(`rotateX(${xRot}deg)`)
-            face.style.transform = transforms.join(" ")
-            face.style.backgroundImage = `url(${texture})`
-            return face
-        }
+        addFace(zSize, ySize, 0, -90, xCenter - xFacePosition, yCenter, zCenter, textureURL)
+        addFace(zSize, ySize, 0, 90, xCenter + xFacePosition, yCenter, zCenter, textureURL)
 
-        const backFace = generateFace(xSize, ySize, 0, 180, element.to[0], element.to[1], zCenter - zFacePosition, textureURL, "Back")
-        const frontFace = generateFace(xSize, ySize, 0, 0, element.to[0], element.to[1], zCenter + zFacePosition, textureURL, "Front")
+        addFace(xSize, zSize, 90, 0, xCenter, yCenter - yFacePosition, zCenter, textureURL)
+        addFace(xSize, zSize, -90, 0, xCenter, yCenter + yFacePosition, zCenter, textureURL)
 
-        const leftFace = generateFace(zSize, ySize, 0, -90, xCenter - xFacePosition, element.to[1], element.to[2], textureURL, "Left")
-        const rightFace = generateFace(zSize, ySize, 0, 90, xCenter + xFacePosition, element.to[1], element.to[2], textureURL, "Right")
+        console.log(`X: ${xCenter},Y: ${yCenter},Z ${zCenter}`)
 
-        const topFace = generateFace(xSize, zSize, 90, 0, element.to[0], yCenter - yFacePosition, element.to[2], textureURL, "Top")
-        const bottomFace = generateFace(xSize, zSize, -90, 0, element.to[0], yCenter + yFacePosition, element.to[2], textureURL, "Bottom")
-
-
-        modelElement.appendChild(frontFace)
-        modelElement.appendChild(backFace)
-        modelElement.appendChild(leftFace)
-        modelElement.appendChild(rightFace)
-        modelElement.appendChild(topFace)
-        modelElement.appendChild(bottomFace)
     })
     containerElement.appendChild(modelElement)
     return containerElement
