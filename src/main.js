@@ -26,19 +26,49 @@ const showcasePlace = document.getElementById("showcase");
 
 let rotation = 30
 
+const constructJsonModel = async (baseModelPath) => {
+    const modelJson = await fetch(`${defaultBlockModelsPath}/${baseModelPath}`)
+        .then(response => response.json())
+    while(modelJson.parent) {
+        const parentJsonPath = modelJson.parent.split("/").slice(-1) + ".json"
+        console.log(`Fetching ${parentJsonPath}`)
+        const childJson = await fetch(`${defaultBlockModelsPath}/${parentJsonPath}`).then(response => response.json())
+        console.log(childJson)
+
+        modelJson.parent = childJson.parent
+        if (!modelJson.textures) {
+            modelJson.textures = {}
+        }
+        if (childJson.textures) {
+            Object.keys(childJson.textures).forEach ((key, idx) => {
+                if (!modelJson.textures.hasOwnProperty(key)) {
+                    modelJson.textures[key] = childJson.textures[key]
+                }
+            })
+        }
+
+        if (!modelJson.elements) {
+            modelJson.elements = []
+        }
+        if(childJson.elements) {
+            modelJson.elements = modelJson.elements.concat(childJson.elements)
+        }
+    }
+    console.log(modelJson)
+    const modelElement = createModelRender(modelJson, "./src/res/defaultSprite.png")
+    showcasePlace.innerHTML = ""
+    showcasePlace.appendChild(modelElement)
+
+    // .then()
+    // .catch(error => {
+    //     console.error("Error rendering model:", error);
+    // });
+}
+
 const refreshModelView = () => {
     if (!defaultTexturesDidLoad) return;
     const selectedModel = modelSelector.value
-    fetch(`${defaultBlockModelsPath}/${selectedModel}`)
-        .then(response => response.json())
-        .then(modelJson => {
-            const modelElement = createModelRender(modelJson, "./src/res/defaultSprite.png")
-            showcasePlace.innerHTML = ""
-            showcasePlace.appendChild(modelElement)
-        })
-        .catch(error => {
-            console.error("Error rendering model:", error);
-        });
+    constructJsonModel(selectedModel)
 }
 
 modelSelector.addEventListener("change", refreshModelView)
