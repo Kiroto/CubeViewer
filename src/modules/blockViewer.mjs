@@ -17,13 +17,18 @@ const generateFace = (width, height, xRot, yRot, xPos, yPos, zPos, texture, tag 
     face.style.height = `${height * pixelToBlockRatio}px`
 
     const transforms = []
+    const xtranslation = (xPos - width / 2)
+    const ytranslation = (yPos - height / 2)
     transforms.push(`translateZ(${(zPos) * pixelToBlockRatio}px)`)
-    transforms.push(`translateX(${(xPos - width / 2) * pixelToBlockRatio}px)`)
-    transforms.push(`translateY(${(yPos - height / 2) * pixelToBlockRatio}px)`)
+    transforms.push(`translateX(${xtranslation * pixelToBlockRatio}px)`)
+    transforms.push(`translateY(${ytranslation * pixelToBlockRatio}px)`)
     transforms.push(`rotateY(${yRot}deg)`)
     transforms.push(`rotateX(${xRot}deg)`)
     face.style.transform = transforms.join(" ")
-    face.style.backgroundImage = `url(${texture})`
+    face.style.backgroundImage = `url(${texture.url})`
+    face.style.backgroundPosition = "bottom left"
+    // face.style.backgroundPositionX = `${texture.xOffset * pixelToBlockRatio}px`
+    // face.style.backgroundPositionY = `${texture.yOffset  * pixelToBlockRatio}px`
     return face
 }
 
@@ -43,6 +48,7 @@ export const createModelRender = (modelJson, defaultTextureUrl, textureMap) => {
             return undefined
         };
         const sideTexture = sideValue.texture
+        const uvs = sideValue.uv
         let faceTexture = defaultTextureUrl
         if (sideTexture.startsWith("#")) {
             const queryTexture = sideTexture.slice(1)
@@ -55,7 +61,7 @@ export const createModelRender = (modelJson, defaultTextureUrl, textureMap) => {
         } else {
             faceTexture = sideTexture
         }
-        return faceTexture;
+        return { url: faceTexture, xOffset: 0, yOffset: 0 };
     }
     const addFace = (...args) => {
         const generatedModel = generateFace.apply(null, args)

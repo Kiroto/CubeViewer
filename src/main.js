@@ -65,10 +65,8 @@ const constructJsonModel = async (baseModelPath, textureOverrides = {}) => {
 
     Object.keys(modelJson.textures).map((key, idx) => {
         const texture = modelJson.textures[key]
-        if (texture.startsWith("minecraft") || texture.indexOf(":") == -1) {
-            const textureValue = `${defaultTexturesPath}/${texture.split(":").slice(-1)}.png`
-            textureMap[key] = textureValue
-        } else if (texture.startsWith("#")) {
+        const isTag = texture.startsWith("#");
+        if (isTag) {
             const pointer = texture.slice(1)
             // if (!pointerList[pointer]) {
             //     pointerList[pointer] = [key]
@@ -78,6 +76,11 @@ const constructJsonModel = async (baseModelPath, textureOverrides = {}) => {
             const ptrValue = modelJson.textures[pointer]
             const assigningTexture = ptrValue ?? "./src/res/defaultSprite.png"
             textureMap[key] = `${defaultTexturesPath}/${assigningTexture.split(":").slice(-1)}.png` //  modelJson.textures[pointer].split(":").slice(-1) + ".png"
+            
+        } else if (texture.startsWith("minecraft") || texture.indexOf(":") == -1) {
+            const filename = texture.split(":").slice(-1)
+            const textureValue = `${defaultTexturesPath}/${filename}.png`
+            textureMap[key] = textureValue
         }
     })
 
