@@ -1,4 +1,4 @@
-const sideClass = ["top", "front", "right", "back", "left", "bottom"]
+const faceIndex = ["top", "front", "right", "back", "left", "bottom"]
 
 const pixelsInBlock = 200
 const blockSize = 16
@@ -6,6 +6,7 @@ const pixelToBlockRatio = pixelsInBlock / blockSize
 
 
 const generateFace = (width, height, xRot, yRot, xPos, yPos, zPos, texture, tag = "", isHelper = false) => {
+    if (!texture) return undefined;
     const face = document.createElement("div")
     face.innerText = tag
     face.classList.add("face")
@@ -17,8 +18,8 @@ const generateFace = (width, height, xRot, yRot, xPos, yPos, zPos, texture, tag 
 
     const transforms = []
     transforms.push(`translateZ(${(zPos) * pixelToBlockRatio}px)`)
-    transforms.push(`translateX(${(xPos - width/2) * pixelToBlockRatio}px)`)
-    transforms.push(`translateY(${(yPos - height/2) * pixelToBlockRatio}px)`)
+    transforms.push(`translateX(${(xPos - width / 2) * pixelToBlockRatio}px)`)
+    transforms.push(`translateY(${(yPos - height / 2) * pixelToBlockRatio}px)`)
     transforms.push(`rotateY(${yRot}deg)`)
     transforms.push(`rotateX(${xRot}deg)`)
     face.style.transform = transforms.join(" ")
@@ -28,15 +29,38 @@ const generateFace = (width, height, xRot, yRot, xPos, yPos, zPos, texture, tag 
 
 
 
-export const createModelRender = (modelJson, textureURL) => {
+export const createModelRender = (modelJson, defaultTextureUrl, textureMap) => {
     const containerElement = document.createElement("div")
     containerElement.classList.add("container")
 
     const modelElement = document.createElement("div")
     modelElement.classList.add("model")
 
+    const parseTexture = (element, side) => {
+        const sideValue = element.faces[side]
+        if (!sideValue) {
+            console.log(`Could not find texture for side ${side}`)
+            return undefined
+        };
+        const sideTexture = sideValue.texture
+        let faceTexture = defaultTextureUrl
+        if (sideTexture.startsWith("#")) {
+            const queryTexture = sideTexture.slice(1)
+            const mappedTexture = textureMap[queryTexture]
+            if (mappedTexture) {
+                faceTexture = mappedTexture
+            } else {
+                console.log(`Could not find expected mapped texture ${queryTexture} in Texture Map: ${textureMap}`)
+            }
+        } else {
+            faceTexture = sideTexture
+        }
+        return faceTexture;
+    }
     const addFace = (...args) => {
-        modelElement.appendChild(generateFace.apply(null, args))
+        const generatedModel = generateFace.apply(null, args)
+        if (generatedModel)
+            modelElement.appendChild(generatedModel)
     }
 
     modelJson.elements.forEach((element, idx) => {
@@ -63,14 +87,14 @@ export const createModelRender = (modelJson, textureURL) => {
         const yCenter = ((element.to[1] + element.from[1]) / 2)
         const zCenter = ((element.to[2] + element.from[2]) / 2) - 8
 
-        addFace(xSize, ySize, 0, 180, xCenter, yCenter, zCenter - zFacePosition, textureURL)
-        addFace(xSize, ySize, 0, 0, xCenter, yCenter, zCenter + zFacePosition, textureURL )
+        addFace(xSize, ySize, 0, 180, xCenter, yCenter, zCenter - zFacePosition, parseTexture(element, "south"))
+        addFace(xSize, ySize, 0, 0, xCenter, yCenter, zCenter + zFacePosition, parseTexture(element, "north"))
 
-        addFace(zSize, ySize, 0, -90, xCenter - xFacePosition, yCenter, zCenter, textureURL)
-        addFace(zSize, ySize, 0, 90, xCenter + xFacePosition, yCenter, zCenter, textureURL)
+        addFace(zSize, ySize, 0, -90, xCenter - xFacePosition, yCenter, zCenter, parseTexture(element, "east"))
+        addFace(zSize, ySize, 0, 90, xCenter + xFacePosition, yCenter, zCenter, parseTexture(element, "west"))
 
-        addFace(xSize, zSize, 90, 0, xCenter, yCenter - yFacePosition, zCenter, textureURL)
-        addFace(xSize, zSize, -90, 0, xCenter, yCenter + yFacePosition, zCenter, textureURL)
+        addFace(xSize, zSize, 90, 0, xCenter, yCenter - yFacePosition, zCenter, parseTexture(element, "up"))
+        addFace(xSize, zSize, -90, 0, xCenter, yCenter + yFacePosition, zCenter, parseTexture(element, "down"))
 
         console.log(`X: ${xCenter},Y: ${yCenter},Z ${zCenter}`)
 
@@ -90,7 +114,7 @@ export const cube = (top, front, right, back, left, bottom) => {
     for (let side = 0; side < 6; side++) {
         const face = document.createElement("div")
         face.classList.add("face")
-        face.classList.add(sideClass[side])
+        face.classList.add(faceIndex[side])
         face.style.backgroundImage = `url(${sideTextures[side]})`
         cubeElement.appendChild(face)
     }

@@ -8,8 +8,11 @@ const generatedListsPath = "./src/res/generated"
 const blockTexturesListPath = `${generatedListsPath}/blockTextureList.json`
 const blockModelsListPath = `${generatedListsPath}/blockModelList.json`
 
-const defaultBlockTexturesPath = `${defaultTexturePackPath}/assets/minecraft/textures/block`
-const defaultBlockModelsPath = `${defaultTexturePackPath}/assets/minecraft/models/block`
+const defaultTexturesPath = `${defaultTexturePackPath}/assets/minecraft/textures`
+const defaultBlockTexturesPath = `${defaultTexturesPath}/block`
+
+const defaultModelsPath = `${defaultTexturePackPath}/assets/minecraft/models`
+const defaultBlockModelsPath = `${defaultModelsPath}/block`
 
 const blockTextureNames = []
 const blockModelNames = []
@@ -24,23 +27,21 @@ let blockModelsDidLoad = false;
 const modelSelector = document.getElementById("modelSelection")
 const showcasePlace = document.getElementById("showcase");
 
-let rotation = 30
-
-const constructJsonModel = async (baseModelPath) => {
+const constructJsonModel = async (baseModelPath, textureOverrides = {}) => {
     const modelJson = await fetch(`${defaultBlockModelsPath}/${baseModelPath}`)
         .then(response => response.json())
-    while(modelJson.parent) {
-        const parentJsonPath = modelJson.parent.split("/").slice(-1) + ".json"
+    while (modelJson.parent) {
+        const parentJsonPath = modelJson.parent.split(":").slice(-1) + ".json"
+
         console.log(`Fetching ${parentJsonPath}`)
-        const childJson = await fetch(`${defaultBlockModelsPath}/${parentJsonPath}`).then(response => response.json())
-        console.log(childJson)
+        const childJson = await fetch(`${defaultModelsPath}/${parentJsonPath}`).then(response => response.json())
 
         modelJson.parent = childJson.parent
         if (!modelJson.textures) {
             modelJson.textures = {}
         }
         if (childJson.textures) {
-            Object.keys(childJson.textures).forEach ((key, idx) => {
+            Object.keys(childJson.textures).forEach((key, idx) => {
                 if (!modelJson.textures.hasOwnProperty(key)) {
                     modelJson.textures[key] = childJson.textures[key]
                 }
@@ -50,12 +51,48 @@ const constructJsonModel = async (baseModelPath) => {
         if (!modelJson.elements) {
             modelJson.elements = []
         }
-        if(childJson.elements) {
+        if (childJson.elements) {
             modelJson.elements = modelJson.elements.concat(childJson.elements)
         }
     }
+
+    Object.keys(textureOverrides).forEach((key, idx) => {
+        modelJson.textures[key] = childJson.textures[key]
+    })
+
+    const textureMap = {}
+    // const pointerList = {}
+
+    Object.keys(modelJson.textures).map((key, idx) => {
+        const texture = modelJson.textures[key]
+        if (texture.startsWith("minecraft") || texture.indexOf(":") == -1) {
+            const textureValue = `${defaultTexturesPath}/${texture.split(":").slice(-1)}.png`
+            textureMap[key] = textureValue
+        } else if (texture.startsWith("#")) {
+            const pointer = texture.slice(1)
+            // if (!pointerList[pointer]) {
+            //     pointerList[pointer] = [key]
+            // } else {
+            //     pointerList[pointer].push(key)
+            // }
+            const ptrValue = modelJson.textures[pointer]
+            const assigningTexture = ptrValue ?? "./src/res/defaultSprite.png"
+            textureMap[key] = `${defaultTexturesPath}/${assigningTexture.split(":").slice(-1)}.png` //  modelJson.textures[pointer].split(":").slice(-1) + ".png"
+        }
+    })
+
+    // Object.keys(textureMap).forEach(key => {
+    //     if (pointerList[key]) {
+    //         pointerList[key].forEach(pointer => {
+    //             textureMap[pointer] = textureMap[key]
+    //         })
+    //     }
+    // })
+
+
     console.log(modelJson)
-    const modelElement = createModelRender(modelJson, "./src/res/defaultSprite.png")
+    console.log(textureMap)
+    const modelElement = createModelRender(modelJson, "./src/res/defaultSprite.png", textureMap)
     showcasePlace.innerHTML = ""
     showcasePlace.appendChild(modelElement)
 
