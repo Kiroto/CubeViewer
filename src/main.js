@@ -49,10 +49,7 @@ const constructJsonModel = async (baseModelPath, textureOverrides = {}) => {
         }
 
         if (!modelJson.elements) {
-            modelJson.elements = []
-        }
-        if (childJson.elements) {
-            modelJson.elements = modelJson.elements.concat(childJson.elements)
+            modelJson.elements = childJson.elements
         }
     }
 
@@ -76,7 +73,7 @@ const constructJsonModel = async (baseModelPath, textureOverrides = {}) => {
             const ptrValue = modelJson.textures[pointer]
             const assigningTexture = ptrValue ?? "./src/res/defaultSprite.png"
             textureMap[key] = `${defaultTexturesPath}/${assigningTexture.split(":").slice(-1)}.png` //  modelJson.textures[pointer].split(":").slice(-1) + ".png"
-            
+
         } else if (texture.startsWith("minecraft") || texture.indexOf(":") == -1) {
             const filename = texture.split(":").slice(-1)
             const textureValue = `${defaultTexturesPath}/${filename}.png`
