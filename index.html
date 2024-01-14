@@ -1,50 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>
-        Well that was kinda easy
-    </h1>
-    <div class="block-loader">
-        <div id="showcase"></div>
-        <div>
-            <select id="modelSelection" name="models">
-                <option value="apple">Apple</option>
-                <option value="banana">Banana</option>
-                <option value="cherry">Cherry</option>
-                <option value="orange">Orange</option>
-                <option value="strawberry">Strawberry</option>
-              </select>
-        </div>
-    </div>
-    <!-- <div class="container">     
-        <div class="cube">
-          <div class="face top" id="top-face">Top</div> 
-          <div class="face bottom" id="bottom-face">Bottom</div>
-          <div class="face left" id="left-face">Left</div>
-          <div class="face right" id="right-face">Right</div>
-          <div class="face front" id="front-face">Front</div>
-          <div class="face back" id="back-face">Back</div>
-        </div>
-      </div> -->
-      <script src="src/main.js" type="module">
 
-      </script>
-      <!-- <script type="module">
-        import { regularCube } from "./src/modules/blocViewer.mjs";
-        // document.getElementById('top-face').style.backgroundImage="url(https://i.etsystatic.com/10800838/r/il/fb4f68/2825858925/il_fullxfull.2825858925_s5dq.jpg)"; // specify the image path here
-        // document.getElementById('bottom-face').style.backgroundImage="url(https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p3856_i147_w750.jpeg)"; // specify the image path here
-        // document.getElementById('left-face').style.backgroundImage="url(https://filterforge.com/filters/11635.jpg)"; // specify the image path here
-        // document.getElementById('right-face').style.backgroundImage="url(https://filterforge.com/filters/11635.jpg)"; // specify the image path here
-        // document.getElementById('front-face').style.backgroundImage="url(https://filterforge.com/filters/11635.jpg)"; // specify the image path here
-        // document.getElementById('back-face').style.backgroundImage="url(https://filterforge.com/filters/11635.jpg)"; // specify the image path here
-        const targetPlace = document.getElementById("showcase");
-        targetPlace.appendChild(regularCube("https://filterforge.com/filters/11635.jpg"))
-      </script> -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h1>
+    Well that was kinda easy
+  </h1>
+  <div class="block-loader">
+    <div id="showcase"></div>
+    <div>
+      <select id="modelSelection" name="models">
+      </select>
+    </div>
+  </div>
+  <script src="src/main.js" type="module">
+
+  </script>
+
 </body>
+
 </html>
