@@ -1,4 +1,4 @@
-import { regularCube, createModelRender } from "./modules/blockViewer.mjs";
+import { createModelRender } from "./modules/blockViewer.mjs";
 import SubscriptableEvent from "./modules/subscriptableEvent.mjs";
 import fileToHumanReadable from "./modules/fileToHumanReadable.mjs";
 
