@@ -2,8 +2,8 @@ import { createModelRender } from "./modules/blockViewer.mjs";
 import SubscriptableEvent from "./modules/subscriptableEvent.mjs";
 import fileToHumanReadable from "./modules/fileToHumanReadable.mjs";
 
-const defaultTexturePackPath = "./src/res/DefaultResourcePack"
-const generatedListsPath = "./src/res/generated"
+const defaultTexturePackPath = "./res/DefaultResourcePack"
+const generatedListsPath = "./res/generated"
 
 const blockTexturesListPath = `${generatedListsPath}/blockTextureList.json`
 const blockModelsListPath = `${generatedListsPath}/blockModelList.json`
